@@ -14,33 +14,53 @@ class BMIScreen extends ConsumerStatefulWidget {
 }
 
 class _BMIScreenState extends ConsumerState<BMIScreen> {
-  final _heightController = TextEditingController();
+  final _feetController = TextEditingController();
+  final _inchesController = TextEditingController();
   final _weightController = TextEditingController();
-  bool _isMetric = true;
 
   @override
   void dispose() {
-    _heightController.dispose();
+    _feetController.dispose();
+    _inchesController.dispose();
     _weightController.dispose();
     super.dispose();
   }
 
   void _calculateBMI() {
-    if (_heightController.text.isEmpty || _weightController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both height and weight')),
-      );
+    if (_feetController.text.isEmpty ||
+        _inchesController.text.isEmpty ||
+        _weightController.text.isEmpty) {
+      _showError('Please enter all values');
       return;
     }
 
-    final height = double.parse(_heightController.text);
-    final weight = double.parse(_weightController.text);
+    final feet = double.tryParse(_feetController.text) ?? 0;
+    final inches = double.tryParse(_inchesController.text) ?? 0;
+    final weight = double.tryParse(_weightController.text) ?? 0;
+
+    if (feet <= 0 || inches < 0 || weight <= 0) {
+      _showError('Please enter valid values');
+      return;
+    }
 
     ref.read(bmiProvider.notifier).calculateBMI(
-      height: height,
+      feet: feet,
+      inches: inches,
       weight: weight,
-      isMetric: _isMetric,
     );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  void _resetInputs() {
+    _feetController.clear();
+    _inchesController.clear();
+    _weightController.clear();
+    ref.read(bmiProvider.notifier).resetCurrentBMI();
   }
 
   @override
@@ -53,12 +73,10 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.history),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const BMIHistoryScreen()),
-              );
-            },
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BMIHistoryScreen()),
+            ),
           ),
         ],
       ),
@@ -73,42 +91,64 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Metric'),
-                      Switch(
-                        value: _isMetric,
-                        onChanged: (value) {
-                          setState(() {
-                            _isMetric = value;
-                            _heightController.clear();
-                            _weightController.clear();
-                          });
-                        },
-                      ),
-                      const Text('Imperial'),
+                      const Icon(Icons.height),
+                      const SizedBox(width: 8),
+                      const Text('Height'),
                     ],
                   ),
                   const SizedBox(height: AppConstants.defaultPadding),
-                  TextField(
-                    controller: _heightController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: _isMetric ? 'Height (cm)' : 'Height (inches)',
-                      border: const OutlineInputBorder(),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _feetController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Feet',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextField(
+                          controller: _inchesController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Inches',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppConstants.defaultPadding),
                   TextField(
                     controller: _weightController,
                     keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: _isMetric ? 'Weight (kg)' : 'Weight (lbs)',
-                      border: const OutlineInputBorder(),
+                    decoration: const InputDecoration(
+                      labelText: 'Weight (kg)',
+                      border: OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: AppConstants.defaultPadding),
-                  CustomButton(
-                    text: 'Calculate BMI',
-                    onPressed: _calculateBMI,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: 'Calculate BMI',
+                          onPressed: _calculateBMI,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: CustomButton(
+                          text: 'Reset',
+                          onPressed: _resetInputs,
+                          backgroundColor: Colors.grey,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -132,6 +172,7 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
                       bmiState.category,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: bmiState.categoryColor,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],

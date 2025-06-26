@@ -25,62 +25,125 @@ class _BMIHistoryScreenState extends ConsumerState<BMIHistoryScreen> {
     final bmiState = ref.watch(bmiProvider);
     final records = bmiState.history;
 
-    if (records.isEmpty) {
-      return const Center(
-        child: Text('No BMI records yet'),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
-      itemCount: records.length,
-      itemBuilder: (context, index) {
-        final record = records[index];
-        return CustomCard(
-          margin: const EdgeInsets.only(bottom: AppConstants.smallPadding),
-          child: Dismissible(
-            key: Key(record.timestamp.toIso8601String()),
-            direction: DismissDirection.endToStart,
-            background: Container(
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: AppConstants.defaultPadding),
-              color: Colors.red,
-              child: const Icon(
-                Icons.delete,
-                color: Colors.white,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('BMI History'),
+      ),
+      body: records.isEmpty
+          ? const Center(
+        child: Text(
+          'No BMI records yet',
+          style: TextStyle(fontSize: 18),
+        ),
+      )
+          : ListView.builder(
+        padding: const EdgeInsets.all(AppConstants.defaultPadding),
+        itemCount: records.length,
+        itemBuilder: (context, index) {
+          final record = records[index];
+          return CustomCard(
+            margin: const EdgeInsets.only(bottom: AppConstants.defaultPadding),
+            child: Dismissible(
+              key: Key(record.timestamp.toIso8601String()),
+              direction: DismissDirection.endToStart,
+              background: Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.only(right: AppConstants.defaultPadding),
+                color: Colors.red,
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            onDismissed: (_) {
-              ref.read(bmiProvider.notifier).deleteRecord(record);
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              onDismissed: (_) {
+                ref.read(bmiProvider.notifier).deleteRecord(record);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Deleted ${record.bmi.toStringAsFixed(1)} BMI record'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        ref.read(bmiProvider.notifier).undoDelete(record);
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(AppConstants.defaultPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'BMI: ${record.bmi.toStringAsFixed(1)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          DateFormat('MMM d, y HH:mm').format(record.timestamp),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppConstants.smallPadding),
                     Text(
-                      'BMI: ${record.bmi.toStringAsFixed(1)}',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      'Height: ${record.feet.toStringAsFixed(0)}\' ${record.inches.toStringAsFixed(1)}"',
+                      style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     Text(
-                      DateFormat('MMM d, y HH:mm').format(record.timestamp),
-                      style: Theme.of(context).textTheme.bodySmall,
+                      'Weight: ${record.weight.toStringAsFixed(1)} kg',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: AppConstants.smallPadding),
+                    Row(
+                      children: [
+                        Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: _getCategoryColor(record.bmi),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _getCategory(record.bmi),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
+                            color: _getCategoryColor(record.bmi),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: AppConstants.smallPadding),
-                Text(
-                  'Height: ${record.height.toStringAsFixed(1)} ${record.isMetric ? 'cm' : 'inches'}',
-                ),
-                Text(
-                  'Weight: ${record.weight.toStringAsFixed(1)} ${record.isMetric ? 'kg' : 'lbs'}',
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
-} 
+
+  String _getCategory(double bmi) {
+    if (bmi < 18.5) return 'Underweight';
+    if (bmi < 25) return 'Normal';
+    if (bmi < 30) return 'Overweight';
+    return 'Obese';
+  }
+
+  Color _getCategoryColor(double bmi) {
+    if (bmi < 18.5) return Colors.blue;
+    if (bmi < 25) return Colors.green;
+    if (bmi < 30) return Colors.orange;
+    return Colors.red;
+  }
+}

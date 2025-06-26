@@ -13,16 +13,17 @@ class BMIProvider extends StateNotifier<BMIState> {
   BMIProvider(this._repository) : super(const BMIState());
 
   Future<void> calculateBMI({
-    required double height,
+    required double feet,
+    required double inches,
     required double weight,
-    required bool isMetric,
   }) async {
-    // Convert to metric if imperial
-    final heightInMeters = isMetric ? height / 100 : height * 0.0254;
-    final weightInKg = isMetric ? weight : weight * 0.453592;
+    // Convert height to total inches
+    final totalInches = feet * 12 + inches;
+    // Convert height to meters
+    final heightInMeters = totalInches * 0.0254;
 
     // Calculate BMI
-    final bmi = weightInKg / (heightInMeters * heightInMeters);
+    final bmi = weight / (heightInMeters * heightInMeters);
 
     // Determine category
     String category;
@@ -44,9 +45,9 @@ class BMIProvider extends StateNotifier<BMIState> {
     // Save to history
     final record = BMIRecord(
       bmi: bmi,
-      height: height,
+      feet: feet,
+      inches: inches,
       weight: weight,
-      isMetric: isMetric,
       timestamp: DateTime.now(),
     );
     await _repository.saveBMIRecord(record);
@@ -55,6 +56,7 @@ class BMIProvider extends StateNotifier<BMIState> {
       bmi: bmi,
       category: category,
       categoryColor: categoryColor,
+      history: state.history,
     );
   }
 
@@ -66,6 +68,19 @@ class BMIProvider extends StateNotifier<BMIState> {
   Future<void> deleteRecord(BMIRecord record) async {
     await _repository.deleteBMIRecord(record);
     await loadHistory();
+  }
+
+  Future<void> undoDelete(BMIRecord record) async {
+    await _repository.saveBMIRecord(record);
+    await loadHistory();
+  }
+
+  void resetCurrentBMI() {
+    state = state.copyWith(
+      bmi: null,
+      category: '',
+      categoryColor: Colors.black,
+    );
   }
 }
 
@@ -95,4 +110,4 @@ class BMIState {
       history: history ?? this.history,
     );
   }
-} 
+}

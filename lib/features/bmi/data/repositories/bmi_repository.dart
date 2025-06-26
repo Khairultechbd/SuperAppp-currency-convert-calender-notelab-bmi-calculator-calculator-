@@ -13,7 +13,7 @@ class BMIRepository {
     final prefs = await SharedPreferences.getInstance();
     final records = await getBMIRecords();
     records.add(record);
-    
+
     final jsonList = records.map((r) => r.toJson()).toList();
     await prefs.setString(AppConstants.bmiHistoryKey, jsonEncode(jsonList));
   }
@@ -21,7 +21,7 @@ class BMIRepository {
   Future<List<BMIRecord>> getBMIRecords() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(AppConstants.bmiHistoryKey);
-    
+
     if (jsonString == null) return [];
 
     final jsonList = jsonDecode(jsonString) as List;
@@ -35,8 +35,8 @@ class BMIRepository {
     final prefs = await SharedPreferences.getInstance();
     final records = await getBMIRecords();
     records.removeWhere((r) => r.timestamp == record.timestamp);
-    
+
     final jsonList = records.map((r) => r.toJson()).toList();
     await prefs.setString(AppConstants.bmiHistoryKey, jsonEncode(jsonList));
   }
-} 
+}

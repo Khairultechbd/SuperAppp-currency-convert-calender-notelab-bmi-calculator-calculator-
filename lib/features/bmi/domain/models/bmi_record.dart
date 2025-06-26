@@ -1,24 +1,24 @@
 class BMIRecord {
   final double bmi;
-  final double height;
+  final double feet;
+  final double inches;
   final double weight;
-  final bool isMetric;
   final DateTime timestamp;
 
   BMIRecord({
     required this.bmi,
-    required this.height,
+    required this.feet,
+    required this.inches,
     required this.weight,
-    required this.isMetric,
     required this.timestamp,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'bmi': bmi,
-      'height': height,
+      'feet': feet,
+      'inches': inches,
       'weight': weight,
-      'isMetric': isMetric,
       'timestamp': timestamp.toIso8601String(),
     };
   }
@@ -26,10 +26,10 @@ class BMIRecord {
   factory BMIRecord.fromJson(Map<String, dynamic> json) {
     return BMIRecord(
       bmi: json['bmi'] as double,
-      height: json['height'] as double,
+      feet: json['feet'] as double,
+      inches: json['inches'] as double,
       weight: json['weight'] as double,
-      isMetric: json['isMetric'] as bool,
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
   }
-} 
+}
