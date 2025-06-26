@@ -178,11 +178,11 @@ class MainMenuScreen extends StatelessWidget {
           _buildFeatureCard(
             context,
             'Currency Converter',
-            Icons.currency_exchange, // ✅ NEW: Proper icon for currency
+            Icons.currency_exchange,
             Colors.purple,
                 () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CurrencyScreen()), // ✅ NEW: Navigate to currency screen
+              MaterialPageRoute(builder: (context) => const CurrencyScreen()), //
             ),
           ),
           _buildFeatureCard(

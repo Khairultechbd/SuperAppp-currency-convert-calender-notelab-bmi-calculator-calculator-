@@ -37,10 +37,10 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
     final weight = double.parse(_weightController.text);
 
     ref.read(bmiProvider.notifier).calculateBMI(
-          height: height,
-          weight: weight,
-          isMetric: _isMetric,
-        );
+      height: height,
+      weight: weight,
+      isMetric: _isMetric,
+    );
   }
 
   @override
@@ -131,8 +131,8 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
                     Text(
                       bmiState.category,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: bmiState.categoryColor,
-                          ),
+                        color: bmiState.categoryColor,
+                      ),
                     ),
                   ],
                 ),
@@ -182,4 +182,4 @@ class _BMIScreenState extends ConsumerState<BMIScreen> {
       ),
     );
   }
-} 
+}
