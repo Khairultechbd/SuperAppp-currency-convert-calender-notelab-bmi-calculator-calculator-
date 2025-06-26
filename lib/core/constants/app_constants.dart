@@ -2,7 +2,7 @@ class AppConstants {
   // App Info
   static const String appName = 'SuperApp';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'A powerful calculator app with advanced features.';
+  static const String appDescription = 'A powerful Super app with advanced features.';
   static const String developerName = 'Md. Khairul Islam';
 
   // Storage Keys

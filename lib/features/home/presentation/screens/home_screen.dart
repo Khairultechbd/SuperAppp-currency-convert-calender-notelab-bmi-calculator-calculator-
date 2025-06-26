@@ -6,7 +6,7 @@ import '../../../calculator/presentation/screens/calculator_screen.dart';
 import '../../../bmi/presentation/screens/bmi_screen.dart';
 import '../../../settings/presentation/screens/settings_screen.dart';
 import '../../../about/presentation/screens/about_screen.dart';
-import '../../../currency/presentation/screens/currency_screen.dart'; //
+import '../../../currency/presentation/screens/currency_screen.dart';
 import '../../../calendar/presentation/screens/calendar_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const NoteLabScreen(),
     const CalculatorScreen(),
     const BMIScreen(),
-    const CurrencyScreen(), //
+    const CurrencyScreen(), // ✅ CHANGED: Added CurrencyScreen()
     const SettingsScreen(),
   ];
 
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'BMI',
           ),
           NavigationDestination(
-            icon: Icon(Icons.currency_exchange), //
+            icon: Icon(Icons.currency_exchange), // ✅ FIXED: proper icon
             selectedIcon: Icon(Icons.currency_exchange),
             label: 'Currency',
           ),
@@ -135,11 +135,11 @@ class MainMenuScreen extends StatelessWidget {
           _buildFeatureCard(
             context,
             'Currency Converter',
-            Icons.currency_exchange, //
+            Icons.currency_exchange, // ✅ NEW: Proper icon for currency
             Colors.purple,
                 () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CurrencyScreen()), //
+              MaterialPageRoute(builder: (context) => const CurrencyScreen()), // ✅ NEW: Navigate to currency screen
             ),
           ),
           _buildFeatureCard(
@@ -177,9 +177,7 @@ class MainMenuScreen extends StatelessWidget {
           const SizedBox(height: AppConstants.smallPadding),
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontSize: title == 'Currency Converter' ? 19 : 22,
-              fontWeight: FontWeight.w600,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
         ],
       ),

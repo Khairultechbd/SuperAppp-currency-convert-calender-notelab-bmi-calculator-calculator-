@@ -10,6 +10,7 @@ import 'package:super_app/features/about/presentation/screens/about_screen.dart'
 import 'package:super_app/features/settings/presentation/providers/settings_provider.dart';
 import 'package:super_app/features/currency/presentation/screens/currency_screen.dart';
 import 'package:super_app/features/calendar/presentation/screens/calendar_screen.dart';
+import 'package:super_app/features/age_calculator/presentation/screens/age_calculator_screen.dart';
 void main() {
   runApp(
     const ProviderScope(
@@ -193,6 +194,16 @@ class MainMenuScreen extends StatelessWidget {
                 () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const CalendarScreen()),
+            ),
+          ),
+          _buildFeatureCard(
+            context,
+            'Age Calculator',
+            Icons.cake,
+            Colors.indigo,
+                () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AgeCalculatorScreen()),
             ),
           ),
         ],
